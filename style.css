@@ -1,272 +1,320 @@
+/* Importa a fonte 'Roboto' do Google Fonts para ser usada em toda a página.
+   Isto garante uma tipografia consistente e moderna. */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
+/* A pseudoclasse :root é usada para declarar variáveis CSS globais.
+   Isto facilita a manutenção do tema da página. Se quisermos mudar uma cor,
+   só precisamos de a alterar num único local. */
 :root {
-    --bg-color: #1a1e23;
-    --card-color: #252a31;
-    --border-color: #3bdeff;
-    --text-color: #e1e1e1;
-    --text-secondary: #8a93a2;
-    --accent-color: #3bdeff;
-    --accent-hover: #ffffff;
-    --input-bg: #2c323a;
+    --bg-color: #1a1e23;             /* Cor de fundo principal (cinza-azulado escuro) */
+    --card-color: #252a31;           /* Cor de fundo para os "cartões" (cards) */
+    --border-color: #3bdeff;         /* Cor principal para bordas e destaques (ciano neon) */
+    --text-color: #e1e1e1;           /* Cor do texto principal (branco-acinzentado) */
+    --text-secondary: #8a93a2;     /* Cor para textos secundários e placeholders (cinza claro) */
+    --accent-color: #3bdeff;         /* Cor de destaque principal, usada em botões e títulos */
+    --accent-hover: #ffffff;         /* Cor usada em efeitos de hover (passar o rato por cima) */
+    --input-bg: #2c323a;             /* Cor de fundo para os campos de entrada (input) */
 }
 
+/* O seletor universal (*) aplica estas regras a TODOS os elementos da página. */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    box-sizing: border-box; /* Garante que o padding e a borda não aumentem o tamanho final do elemento. */
+    margin: 0;              /* Remove as margens padrão que os navegadores aplicam. */
+    padding: 0;             /* Remove os preenchimentos (padding) padrão. */
 }
 
+/* Estilização base para o corpo (body) da página. */
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
+    font-family: 'Roboto', sans-serif; /* Define a fonte principal. */
+    background-color: var(--bg-color);   /* Aplica a cor de fundo definida na variável. */
+    /* Cria uma textura de pontos subtil no fundo para um visual mais tecnológico. */
     background-image: radial-gradient(var(--text-secondary) 0.5px, transparent 0.5px);
     background-size: 15px 15px;
-    color: var(--text-color);
-    line-height: 1.6;
+    color: var(--text-color);            /* Define a cor de texto padrão. */
+    line-height: 1.6;                    /* Melhora a legibilidade do texto ao aumentar o espaçamento entre as linhas. */
 }
 
+/* Estilização do cabeçalho da aplicação. */
 .app-header {
-    display: flex;
-    align-items: center;
-    padding: 1rem 2rem;
-    background-color: var(--card-color);
-    border-bottom: 1px solid #343a46;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    display: flex;         /* Usa Flexbox para alinhar os itens (logótipo e título) horizontalmente. */
+    align-items: center;   /* Centraliza os itens verticalmente dentro do cabeçalho. */
+    padding: 1rem 2rem;    /* Adiciona espaçamento interno (1rem em cima/baixo, 2rem nos lados). */
+    background-color: var(--card-color); /* Define a cor de fundo. */
+    border-bottom: 1px solid #343a46;  /* Adiciona uma linha subtil na parte inferior. */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); /* Adiciona uma sombra para dar profundidade. */
 }
 
+/* Estilização específica para a imagem do logótipo dentro do cabeçalho. */
 .app-header .logo {
-    height: 96px;
-    margin-right: 1rem;
-    border-radius: 8px;
+    height: 96px;       /* Define a altura do logótipo. */
+    margin-right: 1rem; /* Adiciona um espaço à direita do logótipo, separando-o do título. */
+    border-radius: 8px; /* Arredonda os cantos da imagem. */
 }
 
+/* Estilização do título H1 dentro do cabeçalho. */
 .app-header h1 {
-    font-size: 1.75rem;
-    color: var(--text-color);
-    margin: 0;
+    font-size: 1.75rem;     /* Define o tamanho da fonte. */
+    color: var(--text-color); /* Define a cor do texto. */
+    margin: 0;              /* Remove qualquer margem que o H1 possa ter por padrão. */
 }
 
+/* Estilização do contentor principal que envolve todo o conteúdo. */
 .container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 2rem;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    max-width: 1200px; /* Define uma largura máxima para que o layout não fique demasiado largo em ecrãs grandes. */
+    margin: auto;      /* Centra o contentor horizontalmente na página. */
+    padding: 2rem;     /* Adiciona espaçamento interno. */
+    display: grid;     /* Usa o sistema de Grid para organizar os elementos internos. */
+    grid-template-columns: 1fr; /* Cria uma única coluna que ocupa todo o espaço disponível. */
+    gap: 1.5rem;       /* Define o espaçamento entre os elementos da grelha (os cartões). */
 }
 
+/* Estilo base para todos os elementos com a classe "card". */
 .card {
-    background: var(--card-color);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid #343a46;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    background: var(--card-color); /* Cor de fundo do cartão. */
+    padding: 2rem;                 /* Espaçamento interno. */
+    border-radius: 12px;           /* Cantos arredondados. */
+    border: 1px solid #343a46;     /* Borda subtil. */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra para o efeito "flutuante". */
+    transition: all 0.3s ease;     /* Animação suave para todas as propriedades que mudam. */
 }
 
+/* Efeito ao passar o rato por cima de um cartão. */
 .card:hover {
-    border-color: var(--accent-color);
+    border-color: var(--accent-color); /* Muda a cor da borda para a cor de destaque. */
 }
 
+/* Estilo para os títulos H2 dentro dos cartões. */
 .card h2 {
-    color: var(--accent-color);
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #343a46;
-    padding-bottom: 0.75rem;
+    color: var(--accent-color);       /* Cor de destaque. */
+    margin-bottom: 1.5rem;            /* Espaço abaixo do título. */
+    border-bottom: 1px solid #343a46; /* Linha separadora abaixo do título. */
+    padding-bottom: 0.75rem;          /* Espaço entre o texto do título e a linha. */
 }
 
+/* Estilo para os parágrafos dentro dos cartões. */
 .card p {
-    color: var(--text-secondary);
-    margin-bottom: 1rem;
+    color: var(--text-secondary); /* Cor de texto secundária. */
+    margin-bottom: 1rem;        /* Espaço abaixo do parágrafo. */
 }
 
+/* Estilo para o grupo que contém uma label e um input. */
 .input-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.5rem; /* Espaço abaixo do grupo. */
 }
 
+/* Estilo para as labels (rótulos) dos campos de entrada. */
 .input-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
+    display: block;        /* Faz com que a label ocupe a sua própria linha. */
+    margin-bottom: 0.5rem; /* Espaço entre a label e o campo de entrada. */
+    font-weight: bold;     /* Texto a negrito. */
     color: var(--text-secondary);
 }
 
+/* Estilo para os campos de entrada de número e texto. */
 input[type="number"], input[type="text"] {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--input-bg);
-    border: 1px solid #343a46;
-    border-radius: 8px;
-    color: var(--text-color);
-    font-size: 1rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    width: 100%;                  /* Ocupa 100% da largura do seu contentor. */
+    padding: 0.75rem;             /* Espaçamento interno. */
+    background: var(--input-bg);  /* Cor de fundo. */
+    border: 1px solid #343a46;    /* Borda. */
+    border-radius: 8px;           /* Cantos arredondados. */
+    color: var(--text-color);     /* Cor do texto digitado. */
+    font-size: 1rem;              /* Tamanho da fonte. */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Animação suave para a borda e a sombra. */
 }
 
+/* Remove as setas de aumentar/diminuir dos campos de número no Chrome, Safari, etc. */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type="number"] {
+/* Remove as setas de aumentar/diminuir dos campos de número no Firefox. */
+/* input[type="number"] {
   -moz-appearance: textfield;
-}
+} */
 
+/* Estilo para os campos de entrada quando estão em foco (selecionados). */
 input[type="number"]:focus, input[type="text"]:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 10px rgba(59, 222, 255, 0.3);
+    outline: none; /* Remove a borda de foco padrão do navegador. */
+    border-color: var(--accent-color); /* Muda a cor da borda para a cor de destaque. */
+    box-shadow: 0 0 10px rgba(59, 222, 255, 0.3); /* Adiciona um brilho suave. */
 }
 
+/* Estilo base para todos os botões. */
 button {
-    background: transparent;
-    color: var(--accent-color);
-    padding: 0.75rem 1.5rem;
-    border: 1px solid var(--accent-color);
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
+    background: transparent; /* Fundo transparente. */
+    color: var(--accent-color); /* Cor do texto. */
+    padding: 0.75rem 1.5rem; /* Espaçamento interno. */
+    border: 1px solid var(--accent-color); /* Borda com a cor de destaque. */
+    border-radius: 8px; /* Cantos arredondados. */
+    cursor: pointer; /* O cursor muda para uma mão, indicando que é clicável. */
+    font-size: 1rem; /* Tamanho da fonte. */
+    font-weight: bold; /* Texto a negrito. */
+    transition: all 0.3s ease; /* Animação suave. */
+    text-transform: uppercase; /* Converte o texto para maiúsculas. */
 }
 
+/* Efeito ao passar o rato por cima de um botão. */
 button:hover {
-    background: var(--accent-color);
-    color: var(--bg-color);
-    box-shadow: 0 0 15px var(--accent-color);
+    background: var(--accent-color); /* Preenche o fundo com a cor de destaque. */
+    color: var(--bg-color);         /* Muda a cor do texto para a cor de fundo principal (para contraste). */
+    box-shadow: 0 0 15px var(--accent-color); /* Adiciona um efeito de brilho. */
 }
 
+/* Estilo para os botões quando estão desativados. */
 button:disabled {
-    border-color: #4a5568;
-    color: #4a5568;
-    cursor: not-allowed;
+    border-color: #4a5568; /* Cor da borda mais escura. */
+    color: #4a5568;         /* Cor do texto mais escura. */
+    cursor: not-allowed;    /* O cursor indica que não é clicável. */
     background: transparent;
-    box-shadow: none;
+    box-shadow: none;       /* Remove qualquer sombra. */
 }
 
+/* Estilo para o grupo que contém os dois botões de busca. */
 .button-group {
-    display: flex;
-    gap: 1rem;
+    display: flex;  /* Usa Flexbox para os alinhar horizontalmente. */
+    gap: 1rem;      /* Espaço entre os botões. */
 }
 
+/* Estilo específico para o cartão de configuração. */
 #config-card {
-    text-align: left;
+    text-align: left; /* Alinha o texto à esquerda (comportamento padrão, mas garante consistência). */
 }
 
+/* Estilo específico para o botão "Construir Índice". */
 #buildIndexBtn {
-    margin-top: 1rem;
-    display: block;
-    margin-left: auto;
+    margin-top: 1rem;   /* Espaço acima do botão. */
+    display: block;     /* Transforma o botão num elemento de bloco. */
+    margin-left: auto;  /* Juntamente com a linha seguinte, centra o botão horizontalmente. */
     margin-right: auto;
 }
 
+/* Define a grelha para a secção de resultados e estatísticas. */
 #results-and-stats-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr; /* Duas colunas de largura igual. */
+    grid-template-rows: auto auto;    /* Duas linhas com altura automática. */
+    gap: 1.5rem;                      /* Espaço entre os cartões da grelha. */
+    /* Define as áreas da grelha, facilitando a colocação dos elementos. */
     grid-template-areas: 
         "data search"
         "results stats";
 }
 
+/* Atribui cada cartão à sua área correspondente na grelha. */
 #data-display { grid-area: data; }
 #search-section { grid-area: search; }
 #results { 
     grid-area: results; 
-    display: flex;
-    flex-direction: column;
+    display: flex; /* Usa Flexbox para controlar o alinhamento do conteúdo interno. */
+    flex-direction: column; /* Organiza o conteúdo em coluna (um abaixo do outro). */
 }
 #statistics { grid-area: stats; }
 
-/* Centraliza o conteúdo do card de resultados APENAS quando ele tem a classe 'is-placeholder' */
+/* Centraliza o conteúdo do card de resultados APENAS quando ele tem a classe 'is-placeholder'.
+   Esta classe é adicionada/removida via JavaScript. */
 #results.is-placeholder {
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* Alinha verticalmente ao centro. */
+    align-items: center;     /* Alinha horizontalmente ao centro. */
 }
 
-/* Esconde o título do card de resultados quando o placeholder está ativo para um visual mais limpo */
+/* Esconde o título do card de resultados quando o placeholder está ativo para um visual mais limpo. */
 #results.is-placeholder h2 {
     display: none;
 }
 
+/* Estilo para o contentor que mostra a primeira e a última página. */
 .page-display {
-    display: flex;
-    gap: 1.5rem;
+    display: flex; /* Alinha as duas caixas de página horizontalmente. */
+    gap: 1.5rem;   /* Espaço entre elas. */
 }
 
+/* Estilo para as caixas individuais de visualização de página. */
 .page-display > div {
-    flex: 1;
-    background: var(--bg-color);
-    padding: 1rem;
-    border-radius: 8px;
-    height: 300px;
-    overflow-y: auto;
+    flex: 1;                /* Faz com que cada caixa ocupe metade do espaço disponível. */
+    background: var(--bg-color); /* Fundo ligeiramente diferente para contraste. */
+    padding: 1rem;          /* Espaçamento interno. */
+    border-radius: 8px;     /* Cantos arredondados. */
+    height: 300px;          /* Altura fixa. */
+    overflow-y: auto;       /* Adiciona uma barra de scroll vertical se o conteúdo for maior que a altura. */
 }
 
+/* Estilo para os títulos H3 dentro da visualização de página. */
 .page-display h3 {
     margin-bottom: 1rem;
     color: var(--text-secondary);
 }
 
+/* Estilo para a tag <pre>, usada para mostrar as palavras mantendo a formatação. */
 pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-wrap;   /* Permite a quebra de linha automática. */
+    word-wrap: break-word;   /* Quebra palavras longas se necessário. */
+    font-family: 'Courier New', Courier, monospace; /* Fonte monoespaçada, ideal para código/listas. */
     font-size: 0.9rem;
     color: var(--text-color);
 }
 
+/* Estilo para os títulos H3 dentro do painel de resultados. */
 #results h3, #time-comparison h3 {
     color: var(--accent-color);
     margin-top: 1rem;
     margin-bottom: 0.5rem;
 }
+/* Remove a margem do topo do primeiro H3 para um melhor alinhamento. */
 #results > div:first-child h3 {
     margin-top: 0;
 }
 
+/* Estilo para a lista de estatísticas. */
 #statistics ul {
-    list-style: none;
+    list-style: none; /* Remove os pontos/marcadores da lista. */
 }
 
+/* Estilo para cada item da lista de estatísticas. */
 #statistics li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #343a46;
+    padding: 0.5rem 0; /* Espaçamento vertical. */
+    border-bottom: 1px solid #343a46; /* Linha separadora. */
 }
+/* Remove a linha do último item. */
 #statistics li:last-child {
     border-bottom: none;
 }
+/* Estilo para o texto a negrito (os rótulos) na lista. */
 #statistics strong {
     color: var(--text-secondary);
 }
 
+/* Estilo para os valores das estatísticas. */
 #statistics span {
     color: var(--text-color);
-    float: right;
+    float: right; /* Alinha os valores à direita. */
 }
 
+/* Estilo para a palavra de busca destacada nos resultados. */
 .highlight {
-    background-color: rgba(59, 222, 255, 0.2);
-    color: var(--accent-color);
-    padding: 2px 4px;
-    border-radius: 4px;
+    background-color: rgba(59, 222, 255, 0.2); /* Fundo semitransparente. */
+    color: var(--accent-color);                 /* Cor do texto. */
+    padding: 2px 4px;                           /* Pequeno espaçamento. */
+    border-radius: 4px;                         /* Cantos arredondados. */
 }
 
-/* Estilo da barra de scroll */
+/* --- Estilo da barra de scroll (funciona em navegadores baseados em WebKit como Chrome, Edge, Safari) --- */
+/* Define a largura da barra de scroll. */
 .page-display > div::-webkit-scrollbar {
     width: 8px;
 }
+/* Define o estilo do "caminho" da barra de scroll. */
 .page-display > div::-webkit-scrollbar-track {
     background: var(--input-bg);
     border-radius: 10px;
 }
+/* Define o estilo do "polegar" (a parte que se arrasta). */
 .page-display > div::-webkit-scrollbar-thumb {
     background-color: var(--text-secondary);
     border-radius: 10px;
-    border: 2px solid var(--input-bg);
+    border: 2px solid var(--input-bg); /* Cria um efeito de "borda" à volta do polegar. */
 }
+/* Efeito ao passar o rato por cima do "polegar". */
 .page-display > div::-webkit-scrollbar-thumb:hover {
     background-color: var(--accent-color);
 }
