@@ -5,7 +5,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Mapeamento dos Elementos do DOM ---
-    // Cria variáveis para aceder facilmente aos elementos da página.
     const buildIndexBtn = document.getElementById('buildIndexBtn');
     const searchIndexBtn = document.getElementById('searchIndexBtn');
     const tableScanBtn = document.getElementById('tableScanBtn');
@@ -13,41 +12,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const numPagesInput = document.getElementById('numPagesInput');
 
     // --- Variáveis de Estado Global ---
-    // Armazenam os dados enquanto a aplicação está a ser utilizada.
-    let words = [];       // Array para guardar todas as palavras do ficheiro.
-    let pages = [];       // Array de arrays, onde cada array interno é uma página.
-    let hashTable = [];   // Array que representa os buckets da tabela hash.
-    
-    // Objeto para guardar os parâmetros da execução atual.
+    let words = [];
+    let pages = [];
+    let hashTable = [];
     let config = {
-        numPagesReq: 0,   // Número de páginas requisitadas pelo utilizador.
-        numPagesCreated: 0, // Número de páginas efetivamente criadas.
-        wordsPerPage: 0,  // Média de palavras por página (calculado).
-        numBuckets: 0,    // Número de buckets (calculado).
-        bucketSize: 5,    // FR: Tamanho do bucket (definido pela equipa).
-        totalWords: 0,    // NR: Total de palavras carregadas.
+        numPagesReq: 0,
+        numPagesCreated: 0,
+        wordsPerPage: 0,
+        numBuckets: 0,
+        bucketSize: 5,
+        totalWords: 0,
     };
-
-    // Objeto para guardar as estatísticas da construção do índice.
     let stats = {
         collisions: 0,
         overflows: 0,
     };
 
     // --- Adição dos Listeners de Eventos ---
-    // Define o que acontece quando o utilizador interage com a página.
-    buildIndexBtn.addEventListener('click', handleBuildIndex);
-    searchIndexBtn.addEventListener('click', searchWithIndex);
-    tableScanBtn.addEventListener('click', performTableScan);
+    if (buildIndexBtn) buildIndexBtn.addEventListener('click', handleBuildIndex);
+    if (searchIndexBtn) searchIndexBtn.addEventListener('click', searchWithIndex);
+    if (tableScanBtn) tableScanBtn.addEventListener('click', performTableScan);
 
-    // Ativa o botão de busca sequencial assim que o utilizador digita algo.
-    searchKeyInput.addEventListener('keyup', () => {
-        tableScanBtn.disabled = searchKeyInput.value.trim() === '';
-    });
+    // --- Funcionalidade: Ativar/desativar botões e "Enter" para buscar ---
+    if (searchKeyInput) {
+        searchKeyInput.addEventListener('input', () => {
+            const hasText = searchKeyInput.value.trim() !== '';
+            if (searchIndexBtn) searchIndexBtn.disabled = !hasText;
+            if (tableScanBtn) tableScanBtn.disabled = !hasText;
+        });
+
+        searchKeyInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Impede o comportamento padrão do Enter
+                if (searchIndexBtn && !searchIndexBtn.disabled) {
+                    searchIndexBtn.click(); // Simula o clique no botão de busca
+                }
+            }
+        });
+    }
+
 
     /**
      * Função principal que orquestra a construção do índice.
-     * É chamada quando o utilizador clica em "Construir Índice".
      */
     async function handleBuildIndex() {
         console.log("A iniciar a construção do índice...");
@@ -58,37 +64,37 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         config.numPagesReq = numPagesReq;
-        
-        resetState(); // Limpa os dados de uma execução anterior.
+
+        resetState();
 
         try {
-            // 1. Carrega os dados do ficheiro local 'palavras.txt' a partir do caminho relativo correto.
             const response = await fetch('Assets/palavras.txt');
             if (!response.ok) {
-                 throw new Error(`HTTP error! status: ${response.status}. Certifique-se que a pasta 'Assets' com o ficheiro 'palavras.txt' está no mesmo local que o index.html.`);
+                throw new Error(`HTTP error! status: ${response.status}. Certifique-se de que o ficheiro 'palavras.txt' está na pasta Assets.`);
             }
             const text = await response.text();
-            words = text.split(/\r?\n/).filter(word => word.trim() !== ''); // Divide o texto em linhas/palavras.
+            words = text.split(/\r?\n/).filter(word => word.trim() !== '');
             config.totalWords = words.length;
 
-            // 2. Divide as palavras em páginas.
             createPages();
-
-            // 3. Calcula o número de buckets e inicializa a tabela hash.
             createBuckets();
-
-            // 4. Preenche a tabela hash com as palavras e as suas localizações.
             populateHashTable();
-
-            // 5. Atualiza a interface gráfica com os resultados e estatísticas.
             updateStaticDisplay();
-            document.getElementById('data-display').style.display = 'block';
-            document.getElementById('search-section').style.display = 'block';
-            document.getElementById('results-and-stats-grid').style.display = 'grid';
+            setResultsPlaceholder(); // Adiciona a mensagem inicial
+
+            const dataDisplay = document.getElementById('data-display');
+            if (dataDisplay) dataDisplay.style.display = 'block';
+
+            const searchSection = document.getElementById('search-section');
+            if (searchSection) searchSection.style.display = 'block';
+
+            const resultsGrid = document.getElementById('results-and-stats-grid');
+            if (resultsGrid) resultsGrid.style.display = 'grid';
 
             console.log("Construção do índice completa.");
 
-        } catch (error) {
+        } catch (error)
+        {
             console.error("Falha ao carregar ou processar o ficheiro de palavras:", error);
             alert(`Erro: ${error.message}`);
         }
@@ -101,8 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pages = [];
         const totalWords = config.totalWords;
         const numPages = config.numPagesReq;
-        
-        // Calcula quantas palavras devem ir para cada página.
+
         const wordsPerPage = Math.ceil(totalWords / numPages);
         config.wordsPerPage = wordsPerPage;
 
@@ -114,34 +119,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Calcula o número de buckets (NB) com base na fórmula NB > NR / FR
-     * e inicializa a tabela hash como um array de buckets vazios.
+     * Calcula o número de buckets (NB) com base na fórmula NB > NR / FR.
      */
     function createBuckets() {
-        // Garante que a condição NB > NR / FR seja sempre satisfeita.
         config.numBuckets = Math.ceil(config.totalWords / config.bucketSize) + 1;
-        hashTable = Array.from({ length: config.numBuckets }, () => []);
+        hashTable = Array.from({
+            length: config.numBuckets
+        }, () => []);
     }
-    
+
     /**
      * Função de hash: Converte uma chave (palavra) num índice de bucket.
-     * Esta é uma implementação comum e simples (djb2).
-     * @param {string} key - A palavra a ser "hasheada".
-     * @returns {number} O índice do bucket para esta chave.
      */
     function hashFunction(key) {
         let hash = 5381;
         for (let i = 0; i < key.length; i++) {
             hash = (hash * 33) ^ key.charCodeAt(i);
         }
-        // Garante que o resultado seja positivo e dentro dos limites do array de buckets.
         return Math.abs(hash % config.numBuckets);
     }
-    
+
     /**
-     * Percorre todas as palavras em todas as páginas, aplica a função de hash
-     * e armazena a palavra e a sua localização na tabela hash.
-     * Também calcula colisões e overflows.
+     * Percorre todas as palavras, aplica a função de hash e as armazena na tabela.
      */
     function populateHashTable() {
         stats.collisions = 0;
@@ -152,18 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bucketIndex = hashFunction(word);
                 const bucket = hashTable[bucketIndex];
 
-                // Se o bucket já tiver um ou mais itens, é uma colisão.
                 if (bucket.length > 0) {
                     stats.collisions++;
                 }
-                
-                // Se o bucket já estiver cheio, é um overflow.
                 if (bucket.length >= config.bucketSize) {
                     stats.overflows++;
                 }
-                
-                // Adiciona a palavra e o número da sua página ao bucket.
-                bucket.push({ key: word, page: pageIndex });
+                bucket.push({
+                    key: word,
+                    page: pageIndex
+                });
             });
         });
     }
@@ -175,19 +172,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const key = searchKeyInput.value.trim();
         if (!key) return;
 
+        clearResultsPlaceholder();
         const startTime = performance.now();
         const bucketIndex = hashFunction(key);
         const bucket = hashTable[bucketIndex];
-        let cost = 1; // 1 acesso a disco para ler o bucket.
+        let cost = 1;
         let found = false;
 
-        // Procura a chave apenas dentro do bucket correto.
         for (const item of bucket) {
             if (item.key === key) {
-                cost++; // +1 acesso para ler a página de dados.
+                cost++;
                 const pageNumber = item.page;
                 const endTime = performance.now();
-
                 displaySearchResults({
                     found: true,
                     key: key,
@@ -196,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     time: (endTime - startTime).toFixed(4)
                 });
                 found = true;
-                break; // Para a busca assim que encontra.
+                break;
             }
         }
 
@@ -205,14 +201,14 @@ document.addEventListener('DOMContentLoaded', () => {
             displaySearchResults({
                 found: false,
                 key: key,
-                cost: cost, // O custo é 1 mesmo se não encontrar, pois o bucket foi lido.
+                cost: cost,
                 time: (endTime - startTime).toFixed(4)
             });
         }
-        
-        // Limpa resultados de buscas anteriores.
-        document.getElementById('scan-results').innerHTML = '';
-        document.getElementById('time-comparison').innerHTML = '';
+        const scanResults = document.getElementById('scan-results');
+        if (scanResults) scanResults.innerHTML = '';
+        const timeComparison = document.getElementById('time-comparison');
+        if (timeComparison) timeComparison.innerHTML = '';
     }
 
     /**
@@ -222,12 +218,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const key = searchKeyInput.value.trim();
         if (!key) return;
 
+        clearResultsPlaceholder();
         const startTime = performance.now();
         let cost = 0;
         let found = false;
 
         for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
-            cost++; // Custo incrementa para cada página lida.
+            cost++;
             const page = pages[pageIndex];
             if (page.includes(key)) {
                 const endTime = performance.now();
@@ -239,64 +236,111 @@ document.addEventListener('DOMContentLoaded', () => {
                     time: (endTime - startTime).toFixed(4)
                 });
                 found = true;
-                break; // Para a busca assim que encontra.
+                break;
             }
         }
 
         if (!found) {
             const endTime = performance.now();
-            displayScanResults({ found: false, key: key, cost: cost, time: (endTime - startTime).toFixed(4) });
+            displayScanResults({
+                found: false,
+                key: key,
+                cost: cost,
+                time: (endTime - startTime).toFixed(4)
+            });
         }
-        
-        compareSearchTimes(); // Compara os tempos após a busca sequencial.
+
+        compareSearchTimes();
     }
 
     // --- Funções de Atualização da Interface Gráfica (UI) ---
+    /**
+     * Define um texto inicial no painel de resultados.
+     */
+    function setResultsPlaceholder() {
+        const resultsCard = document.getElementById('results');
+        if (resultsCard) resultsCard.classList.add('is-placeholder');
+
+        const searchResultsDiv = document.getElementById('search-results');
+        if (searchResultsDiv) {
+            searchResultsDiv.innerHTML = `<p style="color: var(--text-secondary); font-style: italic;">Aguardando uma busca para exibir os resultados...</p>`;
+        }
+        // Limpar outros resultados para garantir que só o placeholder aparece
+        const scanResultsDiv = document.getElementById('scan-results');
+        if (scanResultsDiv) scanResultsDiv.innerHTML = '';
+        const timeComparisonDiv = document.getElementById('time-comparison');
+        if (timeComparisonDiv) timeComparisonDiv.innerHTML = '';
+    }
+
+    /**
+     * Remove o estado de placeholder do painel de resultados.
+     */
+    function clearResultsPlaceholder() {
+        const resultsCard = document.getElementById('results');
+        if (resultsCard) resultsCard.classList.remove('is-placeholder');
+    }
     
     /**
-     * Limpa todos os dados e reseta a interface para o estado inicial.
+     * Limpa todos os dados e reseta a interface, verificando se os elementos existem.
      */
     function resetState() {
         words = [];
         pages = [];
         hashTable = [];
-        stats = { collisions: 0, overflows: 0 };
-        // Esconde as secções de resultados
+        stats = {
+            collisions: 0,
+            overflows: 0
+        };
         ['data-display', 'search-section', 'results-and-stats-grid'].forEach(id => {
-            document.getElementById(id).style.display = 'none';
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
         });
-        // Limpa os textos dos resultados
-        document.getElementById('firstPage').querySelector('pre').textContent = '';
-        document.getElementById('lastPage').querySelector('pre').textContent = '';
+
+        const firstPagePre = document.getElementById('firstPagePre');
+        if (firstPagePre) firstPagePre.textContent = '';
+
+        const lastPagePre = document.getElementById('lastPagePre');
+        if (lastPagePre) lastPagePre.textContent = '';
+
         ['search-results', 'scan-results', 'time-comparison'].forEach(id => {
-             document.getElementById(id).innerHTML = '';
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = '';
         });
     }
 
     /**
-     * Atualiza os painéis de visualização de páginas e estatísticas.
+     * Atualiza os painéis de visualização e estatísticas, verificando se os elementos existem.
      */
     function updateStaticDisplay() {
-        // Mostra o conteúdo da primeira e da última página.
-        document.getElementById('firstPage').querySelector('pre').textContent = `Página 0:\n\n${pages[0].join('\n')}`;
-        document.getElementById('lastPage').querySelector('pre').textContent = `Página ${pages.length - 1}:\n\n${pages[pages.length - 1].join('\n')}`;
+        const firstPagePre = document.getElementById('firstPagePre');
+        if (firstPagePre && pages.length > 0) {
+            firstPagePre.textContent = pages[0].join('\n');
+        }
 
-        // Preenche a tabela de estatísticas.
-        document.getElementById('totalWords').textContent = config.totalWords;
-        document.getElementById('reqPages').textContent = config.numPagesReq;
-        document.getElementById('numPages').textContent = config.numPagesCreated;
-        document.getElementById('wordsPerPageStat').textContent = config.wordsPerPage;
-        document.getElementById('numBuckets').textContent = config.numBuckets;
-        document.getElementById('bucketSize').textContent = config.bucketSize;
+        const lastPagePre = document.getElementById('lastPagePre');
+        if (lastPagePre && pages.length > 0) {
+            lastPagePre.textContent = pages[pages.length - 1].join('\n');
+        }
+
+        const updateTextContent = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        updateTextContent('totalWords', config.totalWords);
+        updateTextContent('reqPages', config.numPagesReq);
+        updateTextContent('numPages', config.numPagesCreated);
+        updateTextContent('wordsPerPageStat', config.wordsPerPage);
+        updateTextContent('numBuckets', config.numBuckets);
+        updateTextContent('bucketSize', config.bucketSize);
+
         const collisionPercent = ((stats.collisions / config.totalWords) * 100).toFixed(2);
         const overflowPercent = ((stats.overflows / config.totalWords) * 100).toFixed(2);
-        document.getElementById('collisionRate').textContent = `${stats.collisions} (${collisionPercent}%)`;
-        document.getElementById('overflowRate').textContent = `${stats.overflows} (${overflowPercent}%)`;
+
+        updateTextContent('collisionRate', `${stats.collisions} (${collisionPercent}%)`);
+        updateTextContent('overflowRate', `${stats.overflows} (${overflowPercent}%)`);
     }
 
-    /**
-     * Mostra os resultados da busca por índice na interface.
-     */
     function displaySearchResults(result) {
         const resultsDiv = document.getElementById('search-results');
         let html = `<h3>Busca com Índice</h3>`;
@@ -312,15 +356,16 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
         html += `<p>Tempo de Execução: <strong data-time-index="${result.time}">${result.time} ms</strong></p>`;
-        resultsDiv.innerHTML = html;
+        if (resultsDiv) resultsDiv.innerHTML = html;
     }
 
-    /**
-     * Mostra os resultados da busca sequencial na interface.
-     */
     function displayScanResults(result) {
+        // Limpa a div de resultados da busca por índice para não mostrar ambos ao mesmo tempo
+        const searchResultsDiv = document.getElementById('search-results');
+        if(searchResultsDiv) searchResultsDiv.innerHTML = '';
+
         const resultsDiv = document.getElementById('scan-results');
-         let html = `<h3>Busca Sequencial (Table Scan)</h3>`;
+        let html = `<h3>Busca Sequencial (Table Scan)</h3>`;
         if (result.found) {
             html += `
                 <p>Chave "<span class="highlight">${result.key}</span>" encontrada na <strong>Página ${result.page}</strong>.</p>
@@ -333,26 +378,26 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
         html += `<p>Tempo de Execução: <strong data-time-scan="${result.time}">${result.time} ms</strong></p>`;
-        resultsDiv.innerHTML = html;
+        if (resultsDiv) resultsDiv.innerHTML = html;
     }
-    
-    /**
-     * Compara os tempos de execução das duas buscas e mostra na interface.
-     */
+
     function compareSearchTimes() {
         const timeIndexEl = document.querySelector('[data-time-index]');
         const timeScanEl = document.querySelector('[data-time-scan]');
-        
+
         if (timeIndexEl && timeScanEl) {
             const timeIndex = parseFloat(timeIndexEl.dataset.timeIndex);
             const timeScan = parseFloat(timeScanEl.dataset.timeScan);
             const difference = Math.abs(timeScan - timeIndex).toFixed(4);
             const fasterMethod = timeIndex < timeScan ? 'Busca com Índice' : 'Busca Sequencial';
-            
-            document.getElementById('time-comparison').innerHTML = `
-                <h3>Comparação</h3>
-                <p>O método <span class="highlight">${fasterMethod}</span> foi <strong>${difference} ms</strong> mais rápido.</p>
-            `;
+
+            const comparisonDiv = document.getElementById('time-comparison');
+            if (comparisonDiv) {
+                comparisonDiv.innerHTML = `
+                    <h3>Comparação</h3>
+                    <p>O método <span class="highlight">${fasterMethod}</span> foi <strong>${difference} ms</strong> mais rápido.</p>
+                `;
+            }
         }
     }
 });
