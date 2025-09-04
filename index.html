@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Índice Hash Estático</title>
+    <!-- Link para o favicon -->
+    <link rel="icon" type="image/png" href="Assets/Dado.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <img src="Assets/Logo03.png" alt="Logotipo da Aplicação" class="logo">
+        <h1>Projeto de Banco de Dados</h1>
+    </header>
+
+    <main class="container">
+        <div class="card" id="config-card">
+            <h2>Implementação de Índice Hash Estático</h2>
+            <p>Defina a quantidade de páginas para dividir o ficheiro de palavras.</p>
+            <div class="config-grid">
+                <div class="input-group">
+                    <label for="numPagesInput">Quantidade de Páginas</label>
+                    <input type="number" id="numPagesInput" placeholder="Digite o número de páginas">
+                </div>
+            </div>
+             <button id="buildIndexBtn">Construir Índice</button>
+        </div>
+
+        <div id="results-and-stats-grid" style="display: none;">
+            <div id="data-display" class="card" style="display: none;">
+                <h2>Visualização das Páginas</h2>
+                <div class="page-display">
+                    <div id="firstPage">
+                        <h3>Primeira Página</h3>
+                        <pre></pre>
+                    </div>
+                    <div id="lastPage">
+                        <h3>Última Página</h3>
+                        <pre></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-section" class="card" style="display: none;">
+                <h2>Busca de Dados</h2>
+                <div class="input-group">
+                    <label for="searchKey">Chave de Busca</label>
+                    <input type="text" id="searchKey" placeholder="Digite a palavra a ser buscada...">
+                </div>
+                <div class="button-group">
+                    <button id="searchIndexBtn">Buscar com Índice</button>
+                    <button id="tableScanBtn" disabled>Busca Sequencial (Table Scan)</button>
+                </div>
+            </div>
+
+            <div id="results" class="card">
+                <h2>Resultados da Busca</h2>
+                <div id="search-results"></div>
+                <div id="scan-results"></div>
+                <div id="time-comparison"></div>
+            </div>
+
+            <div id="statistics" class="card">
+                <h2>Estatísticas</h2>
+                <ul>
+                    <li><strong>Total de Palavras (NR):</strong> <span id="totalWords">N/A</span></li>
+                    <li><strong>Páginas Requisitadas:</strong> <span id="reqPages">N/A</span></li>
+                    <li><strong>Páginas Criadas:</strong> <span id="numPages">N/A</span></li>
+                    <li><strong>Palavras por Página (média):</strong> <span id="wordsPerPageStat">N/A</span></li>
+                    <li><strong>Nº de Buckets (NB):</strong> <span id="numBuckets">N/A</span></li>
+                    <li><strong>Tamanho do Bucket (FR):</strong> <span id="bucketSize">N/A</span></li>
+                    <li><strong>Taxa de Colisões:</strong> <span id="collisionRate">N/A</span></li>
+                    <li><strong>Taxa de Overflows:</strong> <span id="overflowRate">N/A</span></li>
+                </ul>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
+
