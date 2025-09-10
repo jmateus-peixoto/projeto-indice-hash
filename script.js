@@ -123,7 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
      * Cria a estrutura de buckets, separando itens principais e de overflow.
      */
     function createBuckets() {
-        config.numBuckets = Math.ceil(config.totalWords / config.bucketSize) + 1;
+        // ==========================================================
+        // OTIMIZAÇÃO APLICADA AQUI
+        // Cria um número de buckets igual ao total de palavras para minimizar colisões.
+        config.numBuckets = config.totalWords;
+        // ==========================================================
+        
         hashTable = Array.from({
             length: config.numBuckets
         }, () => ({
@@ -152,12 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pages.forEach((page, pageIndex) => {
             page.forEach(word => {
-                // ==========================================================
-                // CORREÇÃO APLICADA AQUI
-                const bucketIndex = hashFunction(word.toLowerCase()); // Hash da versão minúscula
-                // ==========================================================
+                const bucketIndex = hashFunction(word.toLowerCase());
                 const bucket = hashTable[bucketIndex];
-                const entry = { key: word, page: pageIndex }; // Armazena a palavra original
+                const entry = { key: word, page: pageIndex };
 
                 if (bucket.items.length < config.bucketSize) {
                     if (bucket.items.length > 0) {
