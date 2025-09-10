@@ -152,9 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         pages.forEach((page, pageIndex) => {
             page.forEach(word => {
-                const bucketIndex = hashFunction(word);
+                // ==========================================================
+                // CORREÇÃO APLICADA AQUI
+                const bucketIndex = hashFunction(word.toLowerCase()); // Hash da versão minúscula
+                // ==========================================================
                 const bucket = hashTable[bucketIndex];
-                const entry = { key: word, page: pageIndex };
+                const entry = { key: word, page: pageIndex }; // Armazena a palavra original
 
                 if (bucket.items.length < config.bucketSize) {
                     if (bucket.items.length > 0) {
@@ -209,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cost++;
             displaySearchResults({
                 found: true,
-                key: resultData.originalKey, // Mostra a chave original (ex: "Alan")
+                key: resultData.originalKey,
                 page: resultData.page,
                 cost: cost,
                 time: (endTime - startTime).toFixed(4)
@@ -217,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             displaySearchResults({
                 found: false,
-                key: searchKeyInput.value.trim(), // Mostra o que o usuário digitou
+                key: searchKeyInput.value.trim(),
                 cost: cost,
                 time: (endTime - startTime).toFixed(4)
             });
