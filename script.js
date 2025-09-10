@@ -71,9 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
         resetState();
 
         try {
-            const response = await fetch('Assets/palavras.txt');
+            const response = await fetch('Assets/palavras_2.txt');
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}. Certifique-se de que o ficheiro 'palavras.txt' está na pasta Assets.`);
+                throw new Error(`HTTP error! status: ${response.status}. Certifique-se de que o ficheiro 'palavras_2.txt' está na pasta Assets.`);
             }
             const text = await response.text();
             words = text.split(/\r?\n/).filter(word => word.trim() !== '');
