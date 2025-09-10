@@ -1,12 +1,10 @@
 /**
  * Adiciona um "ouvinte" que espera que toda a estrutura HTML da página (o DOM)
 * seja completamente carregada antes de executar qualquer código JavaScript.
- * Isto previne erros que poderiam acontecer se o script tentasse manipular
- * elementos que ainda não existem na página.
  */
 document.addEventListener('DOMContentLoaded', () => {
 
-     // --- Mapeamento dos Elementos do DOM ---
+    // --- Mapeamento dos Elementos do DOM ---
     const buildIndexBtn = document.getElementById('buildIndexBtn');
     const searchIndexBtn = document.getElementById('searchIndexBtn');
     const tableScanBtn = document.getElementById('tableScanBtn');
@@ -23,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         numPagesCreated: 0,
         wordsPerPage: 0,
         numBuckets: 0,
-        bucketSize: 5, //
+        bucketSize: 5,
         totalWords: 0,
     };
      
@@ -71,10 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetState();
 
         try {
-            // ==========================================================
-            // ALTERAÇÃO APLICADA AQUI
             const response = await fetch('Assets/palavras.txt');
-            // ==========================================================
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}. Certifique-se de que o ficheiro 'palavras.txt' está na pasta Assets.`);
@@ -82,10 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const text = await response.text();
             words = text.split(/\r?\n/).filter(word => word.trim() !== '');
             config.totalWords = words.length;
-
-            // Linhas de depuração (podem ser removidas após a confirmação)
-            console.log("INÍCIO DA DEPURAÇÃO DO ARRAY 'WORDS'");
-            console.log("As 10 primeiras palavras que o JS leu do arquivo são:", words.slice(0, 10));
 
             createPages();
             createBuckets();
@@ -165,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bucket = hashTable[bucketIndex];
                 const entry = { key: word, page: pageIndex };
 
-                // LÓGICA CORRIGIDA DE COLISÃO E OVERFLOW
                 if (bucket.items.length < config.bucketSize) {
                     if (bucket.items.length > 0) {
                         stats.collisions++;
@@ -180,10 +170,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Procura por uma chave utilizando o índice hash.
+     * Procura por uma chave utilizando o índice hash (insensível a maiúsculas/minúsculas).
      */
     function searchWithIndex() {
-        const key = searchKeyInput.value.trim();
+        const key = searchKeyInput.value.trim().toLowerCase();
         if (!key) return;
 
         clearResultsPlaceholder();
@@ -196,8 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let resultData = null;
 
         for (const item of bucket.items) {
-            if (item.key === key) {
-                resultData = { page: item.page };
+            if (item.key.toLowerCase() === key) {
+                resultData = { page: item.page, originalKey: item.key };
                 found = true;
                 break; 
             }
@@ -205,8 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!found) {
             for (const item of bucket.overflow) {
-                if (item.key === key) {
-                    resultData = { page: item.page };
+                if (item.key.toLowerCase() === key) {
+                    resultData = { page: item.page, originalKey: item.key };
                     found = true;
                     break;
                 }
@@ -219,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cost++;
             displaySearchResults({
                 found: true,
-                key: key,
+                key: resultData.originalKey, // Mostra a chave original (ex: "Alan")
                 page: resultData.page,
                 cost: cost,
                 time: (endTime - startTime).toFixed(4)
@@ -227,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             displaySearchResults({
                 found: false,
-                key: key,
+                key: searchKeyInput.value.trim(), // Mostra o que o usuário digitou
                 cost: cost,
                 time: (endTime - startTime).toFixed(4)
             });
@@ -240,25 +230,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Realiza uma busca sequencial (lenta) por todas as páginas.
+     * Realiza uma busca sequencial (insensível a maiúsculas/minúsculas).
      */
     function performTableScan() {
-        const key = searchKeyInput.value.trim();
+        const key = searchKeyInput.value.trim().toLowerCase();
         if (!key) return;
 
         clearResultsPlaceholder();
         const startTime = performance.now();
         let cost = 0;
         let found = false;
+        let originalKey = "";
 
         for (let pageIndex = 0; pageIndex < pages.length; pageIndex++) {
             cost++;
             const page = pages[pageIndex];
-            if (page.includes(key)) {
+            
+            const foundWord = page.find(word => word.toLowerCase() === key);
+
+            if (foundWord) {
+                originalKey = foundWord;
                 const endTime = performance.now();
                 displayScanResults({
                     found: true,
-                    key: key,
+                    key: originalKey,
                     page: pageIndex,
                     cost: cost,
                     time: (endTime - startTime).toFixed(4)
@@ -272,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const endTime = performance.now();
             displayScanResults({
                 found: false,
-                key: key,
+                key: searchKeyInput.value.trim(),
                 cost: cost,
                 time: (endTime - startTime).toFixed(4)
             });
