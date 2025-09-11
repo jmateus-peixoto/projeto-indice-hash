@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('Assets/palavras.txt');
             if (!response.ok) {
-                throw new Error(HTTP error! status: ${response.status}. Certifique-se de que o ficheiro 'palavras.txt' está na pasta Assets.);
+                throw new Error(`HTTP error! status: ${response.status}. Certifique-se de que o ficheiro 'palavras.txt' está na pasta Assets.`);
             }
             const text = await response.text();
             words = text.split(/\r?\n/).filter(word => word.trim() !== '');
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Construção do índice completa.");
         } catch (error) {
             console.error("Falha ao carregar ou processar o ficheiro de palavras:", error);
-            alert(Erro: ${error.message});
+            alert(`Erro: ${error.message}`);
         }
     }
 
@@ -260,8 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        document.getElementById('scan-results').innerHTML = '';
-        document.getElementById('time-comparison').innerHTML = '';
+        compareSearchTimes();
     }
 
     /**
@@ -333,13 +332,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const collisionPercent = config.numBuckets > 0 ? ((stats.overflowBucketsCreated / config.numBuckets) * 100).toFixed(2) : 0;
         const overflowPercent = config.totalWords > 0 ? ((stats.entriesInOverflow / config.totalWords) * 100).toFixed(2) : 0;
 
-        updateText('collisionRate', ${stats.overflowBucketsCreated} (${collisionPercent}%));
-        updateText('overflowRate', ${stats.entriesInOverflow} (${overflowPercent}%));
+        updateText('collisionRate', `${stats.overflowBucketsCreated} (${collisionPercent}%)`);
+        updateText('overflowRate', `${stats.entriesInOverflow} (${overflowPercent}%)`);
     }
     
     function displaySearchResults(result) {
         const resultsDiv = document.getElementById('search-results');
-        let html = <h3>Busca com Índice</h3>;
+        let html = `<h3>Busca com Índice</h3>`;
         if (result.found) {
             const displayPage = result.page + 1; // +1 para exibição (Página 1 em vez de 0)
             html += `
@@ -352,13 +351,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Custo (Acessos a Disco): <strong>${result.cost}</strong></p>
             `;
         }
-        html += <p>Tempo de Execução: <strong data-time-index="${result.time}">${result.time} ms</strong></p>;
+        html += `<p>Tempo de Execução: <strong data-time-index="${result.time}">${result.time} ms</strong></p>`;
         resultsDiv.innerHTML = html;
     }
     
     function displayScanResults(result) {
         const resultsDiv = document.getElementById('scan-results');
-        let html = <h3>Busca Sequencial (Table Scan)</h3>;
+        let html = `<h3>Busca Sequencial (Table Scan)</h3>`;
         if (result.found) {
             const displayPage = result.page + 1;
             html += `
@@ -371,9 +370,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Custo (Páginas Lidas): <strong>${result.cost}</strong></p>
             `;
         }
-        html += <p>Tempo de Execução: <strong data-time-scan="${result.time}">${result.time} ms</strong></p>;
+        html += `<p>Tempo de Execução: <strong data-time-scan="${result.time}">${result.time} ms</strong></p>`;
         resultsDiv.innerHTML = html;
-        document.getElementById('search-results').innerHTML = '';
     }
 
     function compareSearchTimes() {
@@ -414,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsCard.classList.add("is-placeholder");
         const searchResultsDiv = document.getElementById("search-results");
         if (searchResultsDiv) {
-            searchResultsDiv.innerHTML = <p style="color: var(--text-secondary); font-style: italic;">Aguardando uma busca para exibir os resultados...</p>;
+            searchResultsDiv.innerHTML = `<p style="color: var(--text-secondary); font-style: italic;">Aguardando uma busca para exibir os resultados...</p>`;
         }
         document.getElementById("scan-results").innerHTML = '';
         document.getElementById("time-comparison").innerHTML = '';
@@ -422,5 +420,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function clearResultsPlaceholder() {
         document.getElementById("results")?.classList.remove("is-placeholder");
-    }
+    }
 });
