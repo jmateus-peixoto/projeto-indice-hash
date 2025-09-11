@@ -1,66 +1,43 @@
 <!DOCTYPE html>
-<!-- A tag !DOCTYPE define o tipo de documento como HTML5, a versão mais recente do HTML. -->
-<!-- A tag <html> com o atributo lang="pt-br" define o idioma principal da página como Português do Brasil. -->
 <html lang="pt-br">
 <head>
-    <!-- A tag <head> contém metadados sobre a página, que não são exibidos diretamente no conteúdo. -->
-    
-    <!-- <meta charset="UTF-8"> define o conjunto de caracteres como UTF-8, que inclui a maioria dos caracteres especiais e acentos. -->
     <meta charset="UTF-8">
     
-    <!-- <meta name="viewport"...> é crucial para o design responsivo, garantindo que a página se ajuste bem a diferentes tamanhos de ecrã (como telemóveis). -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- <title> define o texto que aparece na aba do navegador. -->
     <title>Índice Hash Estático</title>
     
-    <!-- <link rel="stylesheet"...> conecta este ficheiro HTML ao ficheiro de estilos CSS, aplicando o design à página. -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- <link rel="icon"...> define o "favicon", o pequeno ícone que aparece na aba do navegador. -->
     <link rel="icon" type="image/png" href="Assets/Dado.png">
 </head>
 <body>
-    <!-- A tag <body> contém todo o conteúdo visível da página. -->
-
-    <!-- <header> define o cabeçalho da página. -->
     <header class="app-header">
-        <!-- A tag <img> insere o logótipo. O atributo 'src' especifica o caminho da imagem e 'alt' fornece um texto alternativo. -->
         <img src="Assets/Logo03.png" alt="Logotipo" class="logo">
-        <!-- <h1> define o título principal dentro do cabeçalho. -->
         <h1>Projeto de Banco de Dados</h1>
     </header>
 
-    <!-- <main> define o conteúdo principal da página. A classe "container" é usada pelo CSS para centrar e limitar a largura do conteúdo. -->
     <main class="container">
         
-        <!-- Este é o "cartão" (card) inicial de configuração. O ID "config-card" permite que ele seja estilizado de forma única. -->
         <div id="config-card" class="card">
             <h2>Implementação de Índice Hash Estático</h2>
-            <p>Defina o número de páginas para dividir o conteúdo e clique em construir.</p>
+            <p>Defina o tamanho de cada página (quantas palavras por página) e clique em construir.</p>
             
-            <!-- Agrupa a label e o campo de entrada para estilização. -->
             <div class="input-group">
-                <label for="numPagesInput">Quantidade de Páginas</label>
-                <!-- O campo de entrada para o utilizador inserir o número de páginas. 'type="number"' restringe a entrada a números. -->
-                <input type="number" id="numPagesInput" placeholder="Digite o número de páginas">
+                <label for="pageSizeInput">Tamanho da Página</label>
+                <input type="number" id="pageSizeInput" placeholder="Ex: 100" value="100">
             </div>
             
-            <!-- O botão principal para iniciar o processo. O ID "buildIndexBtn" é usado pelo JavaScript para adicionar a funcionalidade de clique. -->
             <button id="buildIndexBtn">Construir Índice</button>
         </div>
 
-        <!-- Este contentor agrupa todos os resultados e estatísticas. Ele começa escondido (`style="display: none;"`) e é tornado visível pelo JavaScript. -->
         <div id="results-and-stats-grid" style="display: none;">
             
-            <!-- Cartão para exibir a primeira e a última página. -->
             <div id="data-display" class="card">
                 <h2>Visualização das Páginas</h2>
-                <!-- Contentor para alinhar as duas caixas de visualização lado a lado. -->
                 <div class="page-display">
                     <div>
                         <h3>Primeira Página</h3>
-                        <!-- A tag <pre> é usada para exibir texto pré-formatado (mantendo espaços e quebras de linha). O ID é usado pelo JS para inserir as palavras. -->
                         <pre id="firstPagePre"></pre>
                     </div>
                     <div>
@@ -70,54 +47,40 @@
                 </div>
             </div>
 
-            <!-- Cartão para a secção de busca. -->
             <div id="search-section" class="card">
                 <h2>Busca de Dados</h2>
                 <div class="input-group">
                     <label for="searchKey">Chave de Busca</label>
-                    <!-- Campo para o utilizador digitar a palavra a ser procurada. -->
                     <input type="text" id="searchKey" placeholder="Digite a palavra a ser buscada">
                 </div>
-                <!-- Agrupa os botões de busca para estilização. -->
                 <div class="button-group">
-                    <!-- Botão para a busca rápida com o índice. Começa desativado. -->
                     <button id="searchIndexBtn" disabled>Buscar com Índice</button>
-                    <!-- Botão para a busca sequencial. Começa desativado. -->
                     <button id="tableScanBtn" disabled>Busca Sequencial (Table Scan)</button>
                 </div>
             </div>
 
-            <!-- Cartão para exibir os resultados das buscas. -->
             <div id="results" class="card">
                 <h2>Resultados da Busca</h2>
-                <!-- Estas divs vazias serão preenchidas pelo JavaScript com os resultados das buscas. -->
                 <div id="search-results"></div>
                 <div id="scan-results"></div>
                 <div id="time-comparison"></div>
             </div>
 
-            <!-- Cartão para exibir as estatísticas. -->
             <div id="statistics" class="card">
                 <h2>Estatísticas</h2>
-                <!-- <ul> cria uma lista não ordenada. -->
                 <ul>
-                    <!-- Cada <li> é um item da lista. O <span> com um ID é onde o JavaScript irá inserir o valor calculado. -->
                     <li><strong>Total de Palavras (NR):</strong> <span id="totalWords">N/A</span></li>
-                    <li><strong>Páginas Requisitadas:</strong> <span id="reqPages">N/A</span></li>
-                    <li><strong>Páginas Criadas:</strong> <span id="numPages">N/A</span></li>
-                    <li><strong>Palavras por Página (Média):</strong> <span id="wordsPerPageStat">N/A</span></li>
+                    <li><strong>Tamanho da Página Definido:</strong> <span id="pageSizeStat">N/A</span></li>
+                    <li><strong>Total de Páginas Criadas:</strong> <span id="numPages">N/A</span></li>
                     <li><strong>Nº de Buckets (NB):</strong> <span id="numBuckets">N/A</span></li>
                     <li><strong>Tam. do Bucket (FR):</strong> <span id="bucketSize">N/A</span></li>
-                    <li><strong>Taxa de Colisões:</strong> <span id="collisionRate">N/A</span></li>
-                    <li><strong>Taxa de Overflows:</strong> <span id="overflowRate">N/A</span></li>
+                    <li><strong>Taxa de Colisões (Buckets c/ Overflow):</strong> <span id="collisionRate">N/A</span></li>
+                    <li><strong>Taxa de Entradas em Overflow:</strong> <span id="overflowRate">N/A</span></li>
                 </ul>
             </div>
         </div>
     </main>
 
-    <!-- A tag <script> no final do <body> é a melhor prática. Ela garante que toda a página HTML seja carregada
-         antes do JavaScript começar a ser executado, evitando erros de "elemento não encontrado". -->
     <script src="script.js"></script>
 </body>
 </html>
-
